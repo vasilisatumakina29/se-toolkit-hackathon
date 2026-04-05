@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}LostLink — Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div>
+        <span class="pill">Campus lost & found</span>
+        <h1>Report lost items and help others find them faster.</h1>
+        <p class="hero-text">
+            LostLink gives students and staff one place to post lost or found items,
+            browse reports, and mark items as resolved.
+        </p>
+        <div class="hero-actions">
+            <a href="/items/new" class="primary-button">Create report</a>
+            <a href="#reports" class="secondary-button">Browse reports</a>
+        </div>
+    </div>
+    <div class="hero-card">
+        <h3>Version 2 features included</h3>
+        <ul>
+            <li>Lost / found filter</li>
+            <li>Open / resolved status</li>
+            <li>Item details page</li>
+            <li>Docker-ready deployment</li>
+        </ul>
+    </div>
+</section>
+
+<section class="filters card" id="reports">
+    <form method="get" class="filters-form">
+        <div>
+            <label for="search">Search</label>
+            <input id="search" type="text" name="search" value="{{ search }}" placeholder="e.g. AirPods, keys, ID card" />
+        </div>
+
+        <div>
+            <label for="item_type">Type</label>
+            <select id="item_type" name="item_type">
+                <option value="">All</option>
+                <option value="lost" {% if item_type == "lost" %}selected{% endif %}>Lost</option>
+                <option value="found" {% if item_type == "found" %}selected{% endif %}>Found</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="status_filter">Status</label>
+            <select id="status_filter" name="status_filter">
+                <option value="">All</option>
+                <option value="open" {% if status_filter == "open" %}selected{% endif %}>Open</option>
+                <option value="resolved" {% if status_filter == "resolved" %}selected{% endif %}>Resolved</option>
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="primary-button small">Apply</button>
+            <a href="/" class="secondary-button small">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="reports-grid">
+    {% if items %}
+        {% for item in items %}
+        <article class="item-card">
+            <div class="item-card-top">
+                <span class="badge {{ item.item_type.value }}">{{ item.item_type.value }}</span>
+                <span class="badge {{ item.status.value }}">{{ item.status.value }}</span>
+            </div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.description[:140] }}{% if item.description|length > 140 %}...{% endif %}</p>
+            <dl>
+                <div><dt>Category</dt><dd>{{ item.category }}</dd></div>
+                <div><dt>Location</dt><dd>{{ item.location }}</dd></div>
+                <div><dt>Contact</dt><dd>{{ item.contact }}</dd></div>
+            </dl>
+            <div class="item-card-footer">
+                <small>{{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                <a href="/items/{{ item.id }}" class="text-link">View details</a>
+            </div>
+        </article>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state card">
+            <h3>No reports yet</h3>
+            <p>Create the first report to start using LostLink.</p>
+            <a href="/items/new" class="primary-button small">Create report</a>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

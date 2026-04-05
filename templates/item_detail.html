@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}LostLink — {{ item.title }}{% endblock %}
+
+{% block content %}
+<section class="page-intro">
+    <a href="/" class="text-link">← Back to reports</a>
+</section>
+
+<article class="detail-card card">
+    <div class="detail-header">
+        <div>
+            <div class="item-card-top">
+                <span class="badge {{ item.item_type.value }}">{{ item.item_type.value }}</span>
+                <span class="badge {{ item.status.value }}">{{ item.status.value }}</span>
+            </div>
+            <h1>{{ item.title }}</h1>
+            <p class="muted">Created on {{ item.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+        </div>
+        {% if item.status.value == 'open' %}
+        <form action="/items/{{ item.id }}/resolve" method="post">
+            <button type="submit" class="primary-button">Mark as resolved</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="detail-grid">
+        <section>
+            <h3>Description</h3>
+            <p>{{ item.description }}</p>
+        </section>
+        <section>
+            <h3>Details</h3>
+            <dl class="detail-list">
+                <div><dt>Category</dt><dd>{{ item.category }}</dd></div>
+                <div><dt>Location</dt><dd>{{ item.location }}</dd></div>
+                <div><dt>Contact</dt><dd>{{ item.contact }}</dd></div>
+                <div><dt>Type</dt><dd>{{ item.item_type.value }}</dd></div>
+                <div><dt>Status</dt><dd>{{ item.status.value }}</dd></div>
+            </dl>
+        </section>
+    </div>
+</article>
+{% endblock %}

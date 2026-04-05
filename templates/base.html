@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}LostLink{% endblock %}</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+</head>
+<body>
+    <header class="site-header">
+        <div class="container nav">
+            <a class="brand" href="/">LostLink</a>
+            <nav>
+                <a href="/">Home</a>
+                <a href="/items/new" class="button-link">Report item</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="site-footer">
+        <div class="container">
+            <p>LostLink — Campus lost and found made simple.</p>
+        </div>
+    </footer>
+</body>
+</html>
