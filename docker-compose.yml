@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:16
+    container_name: lostlink-db
+    environment:
+      POSTGRES_DB: lostlink
+      POSTGRES_USER: lostlink
+      POSTGRES_PASSWORD: lostlink
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lostlink -d lostlink"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build: .
+    container_name: lostlink-web
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+psycopg2://lostlink:lostlink@db:5432/lostlink
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
