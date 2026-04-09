@@ -24,6 +24,13 @@
         {% endif %}
     </div>
 
+    {% if item.image_data and item.image_mime_type %}
+    <section class="detail-image-section">
+        <h3>Photo</h3>
+        <img class="detail-image" src="/items/{{ item.id }}/image" alt="{{ item.title }}" />
+    </section>
+    {% endif %}
+
     <div class="detail-grid">
         <section>
             <h3>Description</h3>

@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.exc import OperationalError
 
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal, run_migrations
 from app.routers import api, pages
 
 
@@ -16,7 +16,7 @@ def init_db(max_attempts: int = 10, delay_seconds: int = 2) -> None:
         try:
             with SessionLocal() as session:
                 session.execute(text("SELECT 1"))
-            Base.metadata.create_all(bind=engine)
+            run_migrations()
             return
         except OperationalError:
             if attempt == max_attempts:

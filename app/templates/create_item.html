@@ -14,7 +14,7 @@
     <div class="error-box">{{ errors.form }}</div>
     {% endif %}
 
-    <form method="post" action="/items" class="item-form">
+    <form method="post" action="/items" class="item-form" enctype="multipart/form-data">
         <div class="form-grid">
             <div>
                 <label for="title">Title</label>
@@ -51,6 +51,12 @@
             <div class="full-width">
                 <label for="description">Description</label>
                 <textarea id="description" name="description" required minlength="5" maxlength="1000" rows="6" placeholder="Color, brand, where it was seen, identifying details...">{{ form_data.description or '' }}</textarea>
+            </div>
+
+            <div class="full-width">
+                <label for="photo">Photo</label>
+                <input id="photo" name="photo" type="file" accept=".jpg,.jpeg,.png,image/jpeg,image/png" />
+                <p class="field-help">Optional. Upload one JPG or PNG image up to 5 MB.</p>
             </div>
         </div>
 

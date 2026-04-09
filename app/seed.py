@@ -1,4 +1,4 @@
-from app.database import Base, SessionLocal, engine
+from app.database import SessionLocal, run_migrations
 from app.models import Item, ItemStatus, ItemType
 
 SAMPLE_ITEMS = [
@@ -24,7 +24,7 @@ SAMPLE_ITEMS = [
 
 
 def main() -> None:
-    Base.metadata.create_all(bind=engine)
+    run_migrations()
     with SessionLocal() as session:
         has_items = session.query(Item).first()
         if has_items:

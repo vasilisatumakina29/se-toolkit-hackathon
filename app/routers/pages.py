@@ -1,6 +1,7 @@
+from pathlib import Path
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, Response, UploadFile, status
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -13,6 +14,12 @@ from app.schemas import ItemCreate
 router = APIRouter(tags=["pages"])
 templates = Jinja2Templates(directory="app/templates")
 
+MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024
+ALLOWED_PHOTO_TYPES = {
+    "image/jpeg",
+    "image/png",
+}
+
 CATEGORIES = [
     "Electronics",
     "Documents",
@@ -21,6 +28,26 @@ CATEGORIES = [
     "Accessories",
     "Other",
 ]
+
+
+def _extract_photo_payload(photo: UploadFile | None) -> dict[str, bytes | str]:
+    if photo is None or not photo.filename:
+        return {}
+
+    if photo.content_type not in ALLOWED_PHOTO_TYPES:
+        raise ValueError("Please upload a JPG or PNG image.")
+
+    image_data = photo.file.read(MAX_PHOTO_SIZE_BYTES + 1)
+    if not image_data:
+        raise ValueError("Uploaded photo is empty.")
+    if len(image_data) > MAX_PHOTO_SIZE_BYTES:
+        raise ValueError("Photo must be 5 MB or smaller.")
+
+    return {
+        "image_data": image_data,
+        "image_mime_type": photo.content_type,
+        "image_filename": Path(photo.filename).name,
+    }
 
 @router.get("/")
 def home(
@@ -47,9 +74,9 @@ def home(
 
     items = list(db.scalars(query))
     return templates.TemplateResponse(
+        request,
         "index.html",
         {
-            "request": request,
             "items": items,
             "item_type": normalized_item_type or "",
             "status_filter": normalized_status,
@@ -61,8 +88,9 @@ def home(
 @router.get("/items/new")
 def new_item_form(request: Request):
     return templates.TemplateResponse(
+        request,
         "create_item.html",
-        {"request": request, "categories": CATEGORIES, "errors": {}, "form_data": {}},
+        {"categories": CATEGORIES, "errors": {}, "form_data": {}},
     )
 
 
@@ -76,6 +104,7 @@ def create_item(
     location: Annotated[str, Form()],
     contact: Annotated[str, Form()],
     item_type: Annotated[ItemType, Form()],
+    photo: Annotated[UploadFile | None, File()] = None,
 ):
     form_data = {
         "title": title,
@@ -91,9 +120,9 @@ def create_item(
     except Exception as exc:
         errors = {"form": str(exc)}
         return templates.TemplateResponse(
+            request,
             "create_item.html",
             {
-                "request": request,
                 "categories": CATEGORIES,
                 "errors": errors,
                 "form_data": form_data,
@@ -101,7 +130,22 @@ def create_item(
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
-    item = Item(**payload.model_dump())
+    try:
+        photo_payload = _extract_photo_payload(photo)
+    except ValueError as exc:
+        errors = {"form": str(exc)}
+        return templates.TemplateResponse(
+            request,
+            "create_item.html",
+            {
+                "categories": CATEGORIES,
+                "errors": errors,
+                "form_data": form_data,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    item = Item(**payload.model_dump(), **photo_payload)
     db.add(item)
     db.commit()
     db.refresh(item)
@@ -113,7 +157,23 @@ def item_details(request: Request, item_id: int, db: Annotated[Session, Depends(
     item = db.get(Item, item_id)
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
-    return templates.TemplateResponse("item_detail.html", {"request": request, "item": item})
+    return templates.TemplateResponse(request, "item_detail.html", {"item": item})
+
+
+@router.get("/items/{item_id}/image")
+def item_image(item_id: int, db: Annotated[Session, Depends(get_db)]):
+    item = db.get(Item, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    if not item.image_data or not item.image_mime_type:
+        raise HTTPException(status_code=404, detail="Item image not found")
+
+    headers: dict[str, str] = {}
+    if item.image_filename:
+        safe_filename = item.image_filename.replace('"', "")
+        headers["Content-Disposition"] = f'inline; filename="{safe_filename}"'
+
+    return Response(content=item.image_data, media_type=item.image_mime_type, headers=headers)
 
 
 @router.post("/items/{item_id}/resolve")
