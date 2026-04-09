@@ -404,6 +404,7 @@ textarea:focus {
     display: block;
     width: 100%;
     max-height: 420px;
+    object-position: center;
     object-fit: cover;
     border-radius: 20px;
     border: 1px solid var(--border);
@@ -441,5 +442,17 @@ textarea:focus {
         width: 100%;
         justify-content: center;
         flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-image-section {
+        margin: 1.1rem 0 0.9rem;
+    }
+
+    .detail-image {
+        height: min(260px, 52vh);
+        max-height: none;
+        object-fit: contain;
     }
 }

@@ -1,134 +1,119 @@
 # LostLink
 
-A simple campus lost-and-found web app.
+A campus lost-and-found web app for reporting and finding missing items.
 
 ## Demo
-
-Screenshots:
 
 ![LostLink home page](docs/home.png)
 ![LostLink create report page](docs/create-report.png)
 
-## Product context
+## Product Context
 
-### End users
+### End Users
+
 - Students
 - University staff
 
-### Problem that the product solves for end users
-People often lose items such as keys, ID cards, chargers, headphones, or water bottles on campus, but there is usually no centralized place to report them or browse what has already been found.
+### Problem That the Product Solves for End Users
 
-### Solution
-LostLink provides one website where users can submit lost or found item reports, browse all reports, filter them, open a details page, and mark an item as resolved.
+People often lose items such as keys, ID cards, chargers, headphones, or bottles on campus, but there is usually no single place where they can report them or check what has already been found.
+
+### Our Solution
+
+LostLink provides one website where users can post lost or found item reports, browse existing reports, open a detailed page for each item, and mark a case as resolved when the item is returned.
 
 ## Features
 
-### Implemented features
-- Web frontend for end users
-- FastAPI backend with server-rendered pages and JSON API
-- PostgreSQL database support
-- Create a lost/found item report
+### Implemented Features
+
+- Web interface for creating and browsing lost/found reports
+- FastAPI backend with server-rendered pages
+- PostgreSQL support for Docker deployment
+- SQLite support for local development
+- Create a lost or found item report
+- Upload one optional photo for an item report
 - Browse all reports on the home page
-- Filter reports by type and status
+- Filter reports by item type and status
 - Search reports by title or description
 - Open an item details page
 - Mark an item as resolved
-- Dockerfile and Docker Compose for deployment
-- Health check endpoint: `/health`
-- API docs via FastAPI: `/docs`
+- Light/dark theme toggle
+- Health check endpoint at `/health`
+- API documentation via `/docs`
 
-### Not yet implemented
+### Not Yet Implemented
+
 - User authentication
-- Image uploads for item reports
-- Email or push notifications
+- Multiple photos per item
+- Notifications by email or push
 - Admin moderation dashboard
-- Pagination for very large report lists
+- Pagination for large numbers of reports
+- Editing existing reports after creation
 
 ## Usage
 
-### How to use the product
 1. Open the web app in a browser.
-2. Click **Report item**.
-3. Fill in the form with title, type, category, location, contact, and description.
-4. Submit the report.
-5. Browse reports on the home page.
-6. Use filters to view only lost/found or open/resolved reports.
-7. Open an item details page and mark it as resolved when the item is returned.
-
-### API endpoints
-- `GET /api/items` — list all items
-- `POST /api/items` — create a new item
-- `GET /api/items/{id}` — get one item
-- `PATCH /api/items/{id}/resolve` — mark an item as resolved
-
-## Version plan
-
-### Version 1
-- Submit a lost/found report through a web form
-- Save the report to the database
-- Display reports on the home page
-
-### Version 2
-- Filters by type and status
-- Search support
-- Item details page
-- Mark item as resolved
-- Improved UI and Dockerized deployment
+2. Click **Create report**.
+3. Fill in the title, type, category, location, contact info, and description.
+4. Optionally attach a JPG or PNG photo of the item.
+5. Submit the form.
+6. Browse reports on the home page.
+7. Use search and filters to find matching reports.
+8. Open an item details page to view the full information and photo.
+9. Mark the report as resolved once the item is returned.
 
 ## Deployment
 
 ### VM OS
+
 Ubuntu 24.04
 
-### What should be installed on the VM
+### What Should Be Installed on the VM
+
 - Git
 - Docker Engine
 - Docker Compose plugin
 
-### Step-by-step deployment instructions
+### Step-by-Step Deployment Instructions
+
 1. Clone the repository:
+
    ```bash
-   git clone <YOUR_GITHUB_REPO_URL> se-toolkit-hackathon
-   cd se-toolkit-hackathon
+   git clone <YOUR_GITHUB_REPO_URL> lostlink
+   cd lostlink
    ```
-2. Copy the environment file:
+
+2. Create an environment file:
+
    ```bash
    cp .env.example .env
    ```
-3. Start the services:
+
+3. Build and start the containers:
+
    ```bash
    docker compose up --build -d
    ```
-4. Open the product in the browser:
-   - App: `http://<VM_IP>:8000`
-   - Swagger docs: `http://<VM_IP>:8000/docs`
-5. Check container status:
+
+4. Check that the services are running:
+
    ```bash
    docker compose ps
    ```
-6. View logs if needed:
+
+5. Open the application in a browser:
+
+   - App: `http://<VM_IP>:8000`
+   - API docs: `http://<VM_IP>:8000/docs`
+
+6. If needed, inspect logs:
+
    ```bash
    docker compose logs -f
    ```
-7. Stop the project:
+
+7. Stop the deployment:
+
    ```bash
    docker compose down
    ```
-
-### Local run without Docker
-1. Create a virtual environment and activate it.
-2. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Start the app:
-   ```bash
-   uvicorn app.main:app --reload
-   ```
-4. Open `http://127.0.0.1:8000`
-
-### Optional seed data
-To populate the local database with a couple of demo items:
-```bash
-python -m app.seed
-```
