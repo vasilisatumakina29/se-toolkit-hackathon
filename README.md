@@ -4,8 +4,8 @@ A campus lost-and-found web app for reporting and finding missing items.
 
 ## Demo
 
-![LostLink home page](docs/home.png)
-![LostLink create report page](docs/create-report.png)
+![LostLink home page](assets/main_page.png)
+![LostLink create report page](assets/report.png)
 
 ## Product Context
 
