@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}LostLink{% endblock %}</title>
+    <script>
+        (() => {
+            const savedTheme = localStorage.getItem("theme");
+            const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            const theme = savedTheme || (systemPrefersDark ? "dark" : "light");
+            document.documentElement.dataset.theme = theme;
+        })();
+    </script>
     <link rel="stylesheet" href="/static/css/styles.css" />
 </head>
 <body>
@@ -12,6 +20,19 @@
             <a class="brand" href="/">LostLink</a>
             <nav>
                 <a href="/" class="primary-button">Home</a>
+                <button
+                    type="button"
+                    class="theme-toggle"
+                    data-theme-toggle
+                    aria-label="Toggle color theme"
+                    aria-pressed="false"
+                >
+                    <span class="theme-toggle-track" aria-hidden="true">
+                        <span class="theme-toggle-thumb"></span>
+                    </span>
+                    <span class="theme-toggle-text">Theme</span>
+                    <span class="theme-toggle-state" data-theme-label>Light</span>
+                </button>
                 <!-- <a href="/items/new" class="button-link">Report item</a> -->
             </nav>
         </div>
@@ -26,5 +47,6 @@
             <p>LostLink — Campus lost and found made simple.</p>
         </div>
     </footer>
+    <script src="/static/js/theme.js"></script>
 </body>
 </html>
